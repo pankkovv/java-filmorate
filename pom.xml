@@ -67,7 +67,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>ru.yandex.practicum.filmorate</mainClass>
+                    <mainClass>ru.yandex.practicum.filmorate.FilmorateApplication</mainClass>
                 </configuration>
             </plugin>
         </plugins>
