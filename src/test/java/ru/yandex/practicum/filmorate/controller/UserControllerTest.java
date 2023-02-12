@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -21,11 +20,6 @@ class UserControllerTest {
     User userErrOne;
     User userErrTwo;
     User userErrThree;
-
-    @BeforeAll
-    public static void startServer() {
-        users = new UserController();
-    }
 
     @BeforeEach
     public void assistant() {

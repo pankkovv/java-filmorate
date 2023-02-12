@@ -21,11 +21,6 @@ class FilmControllerTest {
     Film filmErrThree;
     Film filmErrFour;
 
-    @BeforeAll
-    public static void startServer() {
-        films = new FilmController();
-    }
-
     @BeforeEach
     public void assistant() {
         filmOne = Film.builder().id(1).name("test").description("test").releaseDate(LocalDate.of(2000, 1, 1)).duration(100).build();
