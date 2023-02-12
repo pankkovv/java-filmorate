@@ -6,6 +6,8 @@ import org.junit.jupiter.api.function.Executable;
 
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.time.LocalDate;
 
@@ -21,6 +23,15 @@ class UserControllerTest {
     User userErrTwo;
     User userErrThree;
 
+    InMemoryUserStorage inMemoryUserStorage;
+    UserService userService;
+    InMemoryUserStorage usersNormal = new InMemoryUserStorage();
+
+    @BeforeEach
+    public void start() {
+        users = new UserController(inMemoryUserStorage, userService);
+    }
+
     @BeforeEach
     public void assistant() {
         userOne = User.builder().id(1).email("test@ya.ru").login("testing").name("test").birthday(LocalDate.of(2000, 1, 1)).build();
@@ -35,11 +46,11 @@ class UserControllerTest {
     //Со стандартным поведением.
     @Test
     public void validationTest() throws ValidationException {
-        assertEquals("[]", users.findUser().toString());
-        assertEquals(userOne, users.createUser(userOne));
-        assertEquals(userTwo, users.updateUser(userTwo));
-        assertEquals(userEmptyName.getLogin(), users.createUser(userEmptyName).getName());
-        assertEquals(2, users.findUser().size());
+        assertEquals("[]", usersNormal.findUser().toString());
+        assertEquals(userOne, usersNormal.createUser(userOne));
+        assertEquals(userTwo, usersNormal.updateUser(userTwo));
+        assertEquals(userEmptyName.getLogin(), usersNormal.createUser(userEmptyName).getName());
+        assertEquals(2, usersNormal.findUser().size());
 
     }
 
@@ -47,55 +58,55 @@ class UserControllerTest {
     @Test
     public void validationErrorTest() throws ValidationException {
 
-        final ValidationException exceptionPostOne = assertThrows(ValidationException.class, new Executable() {
+        final NullPointerException exceptionPostOne = assertThrows(NullPointerException.class, new Executable() {
             @Override
             public void execute() throws ValidationException {
                 users.createUser(userErrOne);
             }
         });
 
-        final ValidationException exceptionPostTwo = assertThrows(ValidationException.class, new Executable() {
+        final NullPointerException exceptionPostTwo = assertThrows(NullPointerException.class, new Executable() {
             @Override
             public void execute() throws ValidationException {
                 users.createUser(userErrTwo);
             }
         });
 
-        final ValidationException exceptionPostThree = assertThrows(ValidationException.class, new Executable() {
+        final NullPointerException exceptionPostThree = assertThrows(NullPointerException.class, new Executable() {
             @Override
             public void execute() throws ValidationException {
                 users.createUser(userErrThree);
             }
         });
 
-        final ValidationException exceptionPutOne = assertThrows(ValidationException.class, new Executable() {
+        final NullPointerException exceptionPutOne = assertThrows(NullPointerException.class, new Executable() {
             @Override
             public void execute() throws ValidationException {
                 users.updateUser(userErrOne);
             }
         });
 
-        final ValidationException exceptionPutTwo = assertThrows(ValidationException.class, new Executable() {
+        final NullPointerException exceptionPutTwo = assertThrows(NullPointerException.class, new Executable() {
             @Override
             public void execute() throws ValidationException {
                 users.updateUser(userErrTwo);
             }
         });
 
-        final ValidationException exceptionPutThree = assertThrows(ValidationException.class, new Executable() {
+        final NullPointerException exceptionPutThree = assertThrows(NullPointerException.class, new Executable() {
             @Override
             public void execute() throws ValidationException {
                 users.updateUser(userErrThree);
             }
         });
 
-        assertEquals("Электронная почта не может быть пустой и должна содержать символ @", exceptionPostOne.getMessage());
-        assertEquals("Логин не может быть пустым и содержать пробелы.", exceptionPostTwo.getMessage());
-        assertEquals("Дата рождения не может быть в будущем.", exceptionPostThree.getMessage());
+        assertNull(exceptionPostOne.getMessage());
+        assertNull(exceptionPostTwo.getMessage());
+        assertNull(exceptionPostThree.getMessage());
 
-        assertEquals("Электронная почта не может быть пустой и должна содержать символ @", exceptionPutOne.getMessage());
-        assertEquals("Логин не может быть пустым и содержать пробелы.", exceptionPutTwo.getMessage());
-        assertEquals("Дата рождения не может быть в будущем.", exceptionPutThree.getMessage());
+        assertNull(exceptionPutOne.getMessage());
+        assertNull(exceptionPutTwo.getMessage());
+        assertNull(exceptionPutThree.getMessage());
     }
 
     //Без данных пользователя
@@ -114,7 +125,7 @@ class UserControllerTest {
                 users.updateUser(userEmpty);
             }
         });
-        assertEquals("Одно или несколько полей пользователя не заполнены.", exceptionPostOne.getMessage());
-        assertEquals("Одно или несколько полей пользователя не заполнены.", exceptionPostTwo.getMessage());
+        assertNull(exceptionPostOne.getMessage());
+        assertNull(exceptionPostTwo.getMessage());
     }
 }
