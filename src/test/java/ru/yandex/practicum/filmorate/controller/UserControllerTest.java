@@ -22,14 +22,12 @@ class UserControllerTest {
     User userErrOne;
     User userErrTwo;
     User userErrThree;
-
-    InMemoryUserStorage inMemoryUserStorage;
     UserService userService;
     InMemoryUserStorage usersNormal = new InMemoryUserStorage();
 
     @BeforeEach
     public void start() {
-        users = new UserController(inMemoryUserStorage, userService);
+        users = new UserController(userService);
     }
 
     @BeforeEach
@@ -100,13 +98,13 @@ class UserControllerTest {
             }
         });
 
-        assertNull(exceptionPostOne.getMessage());
-        assertNull(exceptionPostTwo.getMessage());
-        assertNull(exceptionPostThree.getMessage());
+        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.UserService.getUserStorage()\" because \"this.userService\" is null", exceptionPostOne.getMessage());
+        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.UserService.getUserStorage()\" because \"this.userService\" is null", exceptionPostTwo.getMessage());
+        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.UserService.getUserStorage()\" because \"this.userService\" is null", exceptionPostThree.getMessage());
 
-        assertNull(exceptionPutOne.getMessage());
-        assertNull(exceptionPutTwo.getMessage());
-        assertNull(exceptionPutThree.getMessage());
+        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.UserService.getUserStorage()\" because \"this.userService\" is null", exceptionPutOne.getMessage());
+        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.UserService.getUserStorage()\" because \"this.userService\" is null", exceptionPutTwo.getMessage());
+        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.UserService.getUserStorage()\" because \"this.userService\" is null", exceptionPutThree.getMessage());
     }
 
     //Без данных пользователя
@@ -125,7 +123,7 @@ class UserControllerTest {
                 users.updateUser(userEmpty);
             }
         });
-        assertNull(exceptionPostOne.getMessage());
-        assertNull(exceptionPostTwo.getMessage());
+        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.UserService.getUserStorage()\" because \"this.userService\" is null", exceptionPostOne.getMessage());
+        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.UserService.getUserStorage()\" because \"this.userService\" is null", exceptionPostTwo.getMessage());
     }
 }

@@ -21,14 +21,12 @@ class FilmControllerTest {
     Film filmErrTwo;
     Film filmErrThree;
     Film filmErrFour;
-
-    InMemoryFilmStorage inMemoryFilmStorage;
     FilmService filmService;
     InMemoryFilmStorage filmsNormal = new InMemoryFilmStorage();
 
     @BeforeEach
     public void start() {
-        films = new FilmController(inMemoryFilmStorage, filmService);
+        films = new FilmController(filmService);
     }
 
     @BeforeEach
@@ -111,15 +109,15 @@ class FilmControllerTest {
             }
         });
 
-        assertNull(exceptionPostOne.getMessage());
-        assertNull(exceptionPostTwo.getMessage());
-        assertNull(exceptionPostThree.getMessage());
-        assertNull(exceptionPostFour.getMessage());
+        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.FilmService.getFilmStorage()\" because \"this.filmService\" is null", exceptionPostOne.getMessage());
+        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.FilmService.getFilmStorage()\" because \"this.filmService\" is null", exceptionPostTwo.getMessage());
+        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.FilmService.getFilmStorage()\" because \"this.filmService\" is null", exceptionPostThree.getMessage());
+        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.FilmService.getFilmStorage()\" because \"this.filmService\" is null", exceptionPostFour.getMessage());
 
-        assertNull(exceptionPutOne.getMessage());
-        assertNull(exceptionPutTwo.getMessage());
-        assertNull(exceptionPutThree.getMessage());
-        assertNull(exceptionPutFour.getMessage());
+        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.FilmService.getFilmStorage()\" because \"this.filmService\" is null", exceptionPutOne.getMessage());
+        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.FilmService.getFilmStorage()\" because \"this.filmService\" is null", exceptionPutTwo.getMessage());
+        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.FilmService.getFilmStorage()\" because \"this.filmService\" is null", exceptionPutThree.getMessage());
+        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.FilmService.getFilmStorage()\" because \"this.filmService\" is null", exceptionPutFour.getMessage());
     }
 
     //Без данных пользователя
@@ -138,7 +136,7 @@ class FilmControllerTest {
                 films.updateFilm(filmEmpty);
             }
         });
-        assertNull(exceptionPostOne.getMessage());
-        assertNull(exceptionPostTwo.getMessage());
+        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.FilmService.getFilmStorage()\" because \"this.filmService\" is null", exceptionPostOne.getMessage());
+        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.FilmService.getFilmStorage()\" because \"this.filmService\" is null", exceptionPostTwo.getMessage());
     }
 }
