@@ -16,23 +16,21 @@ import java.util.Set;
 @RestController
 @RequestMapping("/users")
 public class UserController {
-    private InMemoryUserStorage inMemoryUserStorage;
     private UserService userService;
 
     @Autowired
-    public UserController(InMemoryUserStorage inMemoryUserStorage, UserService userService) {
-        this.inMemoryUserStorage = inMemoryUserStorage;
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 
     @GetMapping()
     public Set<User> findUser() {
-        return inMemoryUserStorage.findUser();
+        return userService.getUserStorage().findUser();
     }
 
     @GetMapping("/{id}")
     public User findUserId(@PathVariable int id) {
-        return inMemoryUserStorage.findUserId(id);
+        return userService.getUserStorage().findUserId(id);
     }
 
     @GetMapping("/{id}/friends")
@@ -47,12 +45,12 @@ public class UserController {
 
     @PostMapping
     public User createUser(@Valid @RequestBody User user) throws ValidationException {
-        return inMemoryUserStorage.createUser(user);
+        return userService.getUserStorage().createUser(user);
     }
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) throws ValidationException {
-        return inMemoryUserStorage.updateUser(user);
+        return userService.getUserStorage().updateUser(user);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
