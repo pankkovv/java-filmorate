@@ -8,6 +8,7 @@ import java.util.Set;
 
 public interface FilmStorage {
     Set<Film> findFilm();
+    Film findFilmId(Integer id);
     Film createFilm(Film film) throws ValidationException;
     Film updateFilm(Film film) throws ValidationException;
 
