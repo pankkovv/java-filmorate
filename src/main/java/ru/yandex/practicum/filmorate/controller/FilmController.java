@@ -15,22 +15,20 @@ import java.util.Set;
 @RestController
 @RequestMapping("/films")
 public class FilmController {
-    private InMemoryFilmStorage inMemoryFilmStorage;
     private FilmService filmService;
 
-    public FilmController(InMemoryFilmStorage inMemoryFilmStorage, FilmService filmService) {
-        this.inMemoryFilmStorage = inMemoryFilmStorage;
+    public FilmController(FilmService filmService) {
         this.filmService = filmService;
     }
 
     @GetMapping
     public Set<Film> findFilm() {
-        return inMemoryFilmStorage.findFilm();
+        return filmService.getFilmStorage().findFilm();
     }
 
     @GetMapping("/{id}")
     public Film findFilmId(@PathVariable int id) {
-        return inMemoryFilmStorage.findFilmId(id);
+        return filmService.getFilmStorage().findFilmId(id);
     }
 
     @GetMapping("/popular")
@@ -41,7 +39,7 @@ public class FilmController {
 
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) throws ValidationException {
-        return inMemoryFilmStorage.createFilm(film);
+        return filmService.getFilmStorage().createFilm(film);
     }
 
     @PutMapping("/{id}/like/{userId}")
@@ -51,7 +49,7 @@ public class FilmController {
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) throws ValidationException {
-        return inMemoryFilmStorage.updateFilm(film);
+        return filmService.getFilmStorage().updateFilm(film);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
