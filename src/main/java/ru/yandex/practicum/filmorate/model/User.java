@@ -14,6 +14,7 @@ public class User {
     @Email
     private String email;
     @NotBlank
+    @Size(max = 15)
     private String login;
     private String name;
     @NotNull
