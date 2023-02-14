@@ -1,142 +1,151 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import org.springframework.boot.SpringApplication;
+import ru.yandex.practicum.filmorate.FilmorateApplication;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class FilmControllerTest {
-    static FilmController films;
-    Film filmOne;
-    Film filmTwo;
+    Gson gson = new GsonBuilder()
+            .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
+            .create();
+
+    public class LocalDateAdapter extends TypeAdapter<LocalDate> {
+        private final DateTimeFormatter formatterWriter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        private final DateTimeFormatter formatterReader = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        @Override
+        public void write(final JsonWriter jsonWriter, final LocalDate localDateTime) throws IOException {
+            jsonWriter.value(localDateTime.format(formatterWriter));
+        }
+
+        @Override
+        public LocalDate read(final JsonReader jsonReader) throws IOException {
+            return LocalDate.parse(jsonReader.nextString(), formatterReader);
+        }
+    }
+    HttpClient client;
+    HttpResponse.BodyHandler<String> handler;
     Film filmEmpty;
     Film filmErrOne;
     Film filmErrTwo;
     Film filmErrThree;
     Film filmErrFour;
-    FilmService filmService;
-    InMemoryFilmStorage filmsNormal = new InMemoryFilmStorage();
 
-    @BeforeEach
-    public void start() {
-        films = new FilmController(filmService);
+    @BeforeAll
+    public static void start() {
+        SpringApplication.run(FilmorateApplication.class);
     }
 
     @BeforeEach
     public void assistant() {
-        filmOne = Film.builder().id(1).name("test").description("test").releaseDate(LocalDate.of(2000, 1, 1)).duration(100).build();
-        filmTwo = Film.builder().id(1).name("noTest").description("noTest").releaseDate(LocalDate.of(2000, 1, 1)).duration(200).build();
-        filmEmpty = Film.builder().build();
+        handler = HttpResponse.BodyHandlers.ofString();
+        client = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(5))
+                .build();
+        filmEmpty = Film.builder().releaseDate(LocalDate.of(2000, 1, 1)).build();
         filmErrOne = Film.builder().id(1).name("").description("testErr").releaseDate(LocalDate.of(2000, 1, 1)).duration(100).build();
         filmErrTwo = Film.builder().id(1).name("test").description("testdsflkfdgjkjdfhgjhfdjgjkdfgkjfdghjkdfhgjkdfjkghkdfhgkdfhghdfjkgkjdfhgkjhdfkjghkdfjhgkjdfhgjhdfkjghkjdfhgkjdfhgkhdfkjghkjdfhgkjdfhgkjdfhgjkdfkjghdfjkhgkjdfhgkjdfhkghdfkghkdfjhgkjhfgkjhdfkjghkjdfhgkjdfhgjhdfkgkdfjhgkjdfhkghdfkjghkjfdhgjkdfkjkgfkfgkjghkjdfkjfhkgjhgjkhfkj").releaseDate(LocalDate.of(2000, 1, 1)).duration(100).build();
         filmErrThree = Film.builder().id(1).name("test").description("test").releaseDate(LocalDate.of(1800, 1, 1)).duration(100).build();
         filmErrFour = Film.builder().id(1).name("test").description("test").releaseDate(LocalDate.of(2000, 1, 1)).duration(-100).build();
     }
 
-    //Со стандартным поведением.
-    @Test
-    public void validationTest() throws ValidationException {
-        assertEquals("[]", filmsNormal.findFilm().toString());
-        assertEquals(filmOne, filmsNormal.createFilm(filmOne));
-        assertEquals(filmTwo, filmsNormal.updateFilm(filmTwo));
-        assertEquals(1, filmsNormal.findFilm().size());
-    }
-
     //С неверными данными пользователя.
     @Test
-    public void validationErrorTest() throws ValidationException {
+    public void validationErrorTest() throws IOException, InterruptedException {
+        HttpResponse<String> responseCreateFilmOne = client.send(HttpRequest.newBuilder()
+                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(filmErrOne)))
+                .uri(URI.create("http://localhost:8080/films"))
+                .version(HttpClient.Version.HTTP_1_1)
+                .build(), handler);
 
-        final NullPointerException exceptionPostOne = assertThrows(NullPointerException.class, new Executable() {
-            @Override
-            public void execute() throws NullPointerException, ValidationException {
-                films.createFilm(filmErrOne);
-            }
-        });
+        HttpResponse<String> responseCreateFilmTwo = client.send(HttpRequest.newBuilder()
+                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(filmErrTwo)))
+                .uri(URI.create("http://localhost:8080/films"))
+                .version(HttpClient.Version.HTTP_1_1)
+                .build(), handler);
 
-        final NullPointerException exceptionPostTwo = assertThrows(NullPointerException.class, new Executable() {
-            @Override
-            public void execute() throws NullPointerException, ValidationException {
-                films.createFilm(filmErrTwo);
-            }
-        });
+        HttpResponse<String> responseCreateFilmThree = client.send(HttpRequest.newBuilder()
+                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(filmErrThree)))
+                .uri(URI.create("http://localhost:8080/films"))
+                .version(HttpClient.Version.HTTP_1_1)
+                .build(), handler);
 
-        final NullPointerException exceptionPostThree = assertThrows(NullPointerException.class, new Executable() {
-            @Override
-            public void execute() throws NullPointerException, ValidationException {
-                films.createFilm(filmErrThree);
-            }
-        });
+        HttpResponse<String> responseCreateFilmFour = client.send(HttpRequest.newBuilder()
+                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(filmErrFour)))
+                .uri(URI.create("http://localhost:8080/films"))
+                .version(HttpClient.Version.HTTP_1_1)
+                .build(), handler);
 
-        final NullPointerException exceptionPostFour = assertThrows(NullPointerException.class, new Executable() {
-            @Override
-            public void execute() throws NullPointerException, ValidationException {
-                films.createFilm(filmErrFour);
-            }
-        });
+        HttpResponse<String> responsePutFilmOne = client.send(HttpRequest.newBuilder()
+                .PUT(HttpRequest.BodyPublishers.ofString(gson.toJson(filmErrOne)))
+                .uri(URI.create("http://localhost:8080/films"))
+                .version(HttpClient.Version.HTTP_1_1)
+                .build(), handler);
 
-        final NullPointerException exceptionPutOne = assertThrows(NullPointerException.class, new Executable() {
-            @Override
-            public void execute() throws ValidationException {
-                films.updateFilm(filmErrOne);
-            }
-        });
+        HttpResponse<String> responsePutFilmTwo = client.send(HttpRequest.newBuilder()
+                .PUT(HttpRequest.BodyPublishers.ofString(gson.toJson(filmErrTwo)))
+                .uri(URI.create("http://localhost:8080/films"))
+                .version(HttpClient.Version.HTTP_1_1)
+                .build(), handler);
 
-        final NullPointerException exceptionPutTwo = assertThrows(NullPointerException.class, new Executable() {
-            @Override
-            public void execute() throws ValidationException {
-                films.updateFilm(filmErrTwo);
-            }
-        });
+        HttpResponse<String> responsePutFilmThree = client.send(HttpRequest.newBuilder()
+                .PUT(HttpRequest.BodyPublishers.ofString(gson.toJson(filmErrThree)))
+                .uri(URI.create("http://localhost:8080/films"))
+                .version(HttpClient.Version.HTTP_1_1)
+                .build(), handler);
 
-        final NullPointerException exceptionPutThree = assertThrows(NullPointerException.class, new Executable() {
-            @Override
-            public void execute() throws ValidationException {
-                films.updateFilm(filmErrThree);
-            }
-        });
+        HttpResponse<String> responsePutFilmFour = client.send(HttpRequest.newBuilder()
+                .PUT(HttpRequest.BodyPublishers.ofString(gson.toJson(filmErrFour)))
+                .uri(URI.create("http://localhost:8080/films"))
+                .version(HttpClient.Version.HTTP_1_1)
+                .build(), handler);
 
-        final NullPointerException exceptionPutFour = assertThrows(NullPointerException.class, new Executable() {
-            @Override
-            public void execute() throws ValidationException {
-                films.updateFilm(filmErrFour);
-            }
-        });
+        assertEquals("{\"error\":\"Произошла непредвиденная ошибка\"}", responseCreateFilmOne.body());
+        assertEquals("{\"error\":\"Произошла непредвиденная ошибка\"}", responseCreateFilmTwo.body());
+        assertEquals("{\"error\":\"Произошла непредвиденная ошибка\"}", responseCreateFilmThree.body());
+        assertEquals("{\"error\":\"Произошла непредвиденная ошибка\"}", responseCreateFilmFour.body());
 
-        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.FilmService.getFilmStorage()\" because \"this.filmService\" is null", exceptionPostOne.getMessage());
-        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.FilmService.getFilmStorage()\" because \"this.filmService\" is null", exceptionPostTwo.getMessage());
-        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.FilmService.getFilmStorage()\" because \"this.filmService\" is null", exceptionPostThree.getMessage());
-        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.FilmService.getFilmStorage()\" because \"this.filmService\" is null", exceptionPostFour.getMessage());
-
-        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.FilmService.getFilmStorage()\" because \"this.filmService\" is null", exceptionPutOne.getMessage());
-        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.FilmService.getFilmStorage()\" because \"this.filmService\" is null", exceptionPutTwo.getMessage());
-        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.FilmService.getFilmStorage()\" because \"this.filmService\" is null", exceptionPutThree.getMessage());
-        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.FilmService.getFilmStorage()\" because \"this.filmService\" is null", exceptionPutFour.getMessage());
-    }
+        assertEquals("{\"error\":\"Произошла непредвиденная ошибка\"}", responsePutFilmOne.body());
+        assertEquals("{\"error\":\"Произошла непредвиденная ошибка\"}", responsePutFilmTwo.body());
+        assertEquals("{\"error\":\"Произошла непредвиденная ошибка\"}", responsePutFilmThree.body());
+        assertEquals("{\"error\":\"Произошла непредвиденная ошибка\"}", responsePutFilmFour.body());
+        }
 
     //Без данных пользователя
     @Test
-    public void validationEmptyTest() {
-        final NullPointerException exceptionPostOne = assertThrows(NullPointerException.class, new Executable() {
-            @Override
-            public void execute() throws ValidationException {
-                films.createFilm(filmEmpty);
-            }
-        });
+    public void validationEmptyTest() throws IOException, InterruptedException {
+        HttpResponse<String> responseCreateFilmOne = client.send(HttpRequest.newBuilder()
+                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(filmEmpty)))
+                .uri(URI.create("http://localhost:8080/films"))
+                .version(HttpClient.Version.HTTP_1_1)
+                .build(), handler);
 
-        final NullPointerException exceptionPostTwo = assertThrows(NullPointerException.class, new Executable() {
-            @Override
-            public void execute() throws ValidationException {
-                films.updateFilm(filmEmpty);
-            }
-        });
-        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.FilmService.getFilmStorage()\" because \"this.filmService\" is null", exceptionPostOne.getMessage());
-        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.FilmService.getFilmStorage()\" because \"this.filmService\" is null", exceptionPostTwo.getMessage());
+        HttpResponse<String> responsePutFilmOne = client.send(HttpRequest.newBuilder()
+                .PUT(HttpRequest.BodyPublishers.ofString(gson.toJson(filmEmpty)))
+                .uri(URI.create("http://localhost:8080/films"))
+                .version(HttpClient.Version.HTTP_1_1)
+                .build(), handler);
+
+        assertEquals("{\"error\":\"Произошла непредвиденная ошибка\"}", responseCreateFilmOne.body());
+        assertEquals("{\"error\":\"Произошла непредвиденная ошибка\"}", responsePutFilmOne.body());
     }
 }

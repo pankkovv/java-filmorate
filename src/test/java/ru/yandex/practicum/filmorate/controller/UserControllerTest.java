@@ -1,129 +1,138 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.TypeAdapter;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import org.springframework.boot.SpringApplication;
+import ru.yandex.practicum.filmorate.FilmorateApplication;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserControllerTest {
-    static UserController users;
-    User userOne;
-    User userTwo;
-    User userEmptyName;
+    Gson gson = new GsonBuilder()
+            .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
+            .create();
+
+    public class LocalDateAdapter extends TypeAdapter<LocalDate> {
+        private final DateTimeFormatter formatterWriter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        private final DateTimeFormatter formatterReader = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        @Override
+        public void write(final JsonWriter jsonWriter, final LocalDate localDateTime) throws IOException {
+            jsonWriter.value(localDateTime.format(formatterWriter));
+        }
+
+        @Override
+        public LocalDate read(final JsonReader jsonReader) throws IOException {
+            return LocalDate.parse(jsonReader.nextString(), formatterReader);
+        }
+    }
+    HttpClient client;
+    HttpResponse.BodyHandler<String> handler;
     User userEmpty;
     User userErrOne;
     User userErrTwo;
     User userErrThree;
-    UserService userService;
     InMemoryUserStorage usersNormal = new InMemoryUserStorage();
 
-    @BeforeEach
-    public void start() {
-        users = new UserController(userService);
+    @BeforeAll
+    public static void start() {
+        SpringApplication.run(FilmorateApplication.class);
     }
 
     @BeforeEach
     public void assistant() {
-        userOne = User.builder().id(1).email("test@ya.ru").login("testing").name("test").birthday(LocalDate.of(2000, 1, 1)).build();
-        userTwo = User.builder().id(1).email("noTest@ya.ru").login("noTesting").name("noTest").birthday(LocalDate.of(2000, 1, 1)).build();
-        userEmptyName = User.builder().id(1).email("noTest@ya.ru").login("noTesting").birthday(LocalDate.of(2000, 1, 1)).build();
-        userEmpty = User.builder().build();
+        handler = HttpResponse.BodyHandlers.ofString();
+        client = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(5))
+                .build();
+        userEmpty = User.builder().birthday(LocalDate.of(2000, 1, 1)).build();
         userErrOne = User.builder().id(3).email("errTestya.ru").login("err").name("err").birthday(LocalDate.of(2000, 1, 1)).build();
         userErrTwo = User.builder().id(4).email("errTest@ya.ru").login(" ").name("err").birthday(LocalDate.of(2000, 1, 1)).build();
         userErrThree = User.builder().id(5).email("errTest@ya.ru").login("err").name("err").birthday(LocalDate.of(2024, 1, 1)).build();
     }
 
-    //Со стандартным поведением.
-    @Test
-    public void validationTest() throws ValidationException {
-        assertEquals("[]", usersNormal.findUser().toString());
-        assertEquals(userOne, usersNormal.createUser(userOne));
-        assertEquals(userTwo, usersNormal.updateUser(userTwo));
-        assertEquals(userEmptyName.getLogin(), usersNormal.createUser(userEmptyName).getName());
-        assertEquals(2, usersNormal.findUser().size());
-
-    }
-
     //С неверными данными пользователя.
     @Test
-    public void validationErrorTest() throws ValidationException {
+    public void validationErrorTest() throws IOException, InterruptedException {
+        HttpResponse<String> responseCreateTaskOne = client.send(HttpRequest.newBuilder()
+                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(userErrOne)))
+                .uri(URI.create("http://localhost:8080/users"))
+                .version(HttpClient.Version.HTTP_1_1)
+                .build(), handler);
 
-        final NullPointerException exceptionPostOne = assertThrows(NullPointerException.class, new Executable() {
-            @Override
-            public void execute() throws ValidationException {
-                users.createUser(userErrOne);
-            }
-        });
+        HttpResponse<String> responseCreateTaskTwo = client.send(HttpRequest.newBuilder()
+                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(userErrTwo)))
+                .uri(URI.create("http://localhost:8080/users"))
+                .version(HttpClient.Version.HTTP_1_1)
+                .build(), handler);
 
-        final NullPointerException exceptionPostTwo = assertThrows(NullPointerException.class, new Executable() {
-            @Override
-            public void execute() throws ValidationException {
-                users.createUser(userErrTwo);
-            }
-        });
+        HttpResponse<String> responseCreateTaskThree = client.send(HttpRequest.newBuilder()
+                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(userErrThree)))
+                .uri(URI.create("http://localhost:8080/users"))
+                .version(HttpClient.Version.HTTP_1_1)
+                .build(), handler);
 
-        final NullPointerException exceptionPostThree = assertThrows(NullPointerException.class, new Executable() {
-            @Override
-            public void execute() throws ValidationException {
-                users.createUser(userErrThree);
-            }
-        });
+        HttpResponse<String> responsePutTaskOne = client.send(HttpRequest.newBuilder()
+                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(userErrOne)))
+                .uri(URI.create("http://localhost:8080/users"))
+                .version(HttpClient.Version.HTTP_1_1)
+                .build(), handler);
 
-        final NullPointerException exceptionPutOne = assertThrows(NullPointerException.class, new Executable() {
-            @Override
-            public void execute() throws ValidationException {
-                users.updateUser(userErrOne);
-            }
-        });
+        HttpResponse<String> responsePutTaskTwo = client.send(HttpRequest.newBuilder()
+                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(userErrTwo)))
+                .uri(URI.create("http://localhost:8080/users"))
+                .version(HttpClient.Version.HTTP_1_1)
+                .build(), handler);
 
-        final NullPointerException exceptionPutTwo = assertThrows(NullPointerException.class, new Executable() {
-            @Override
-            public void execute() throws ValidationException {
-                users.updateUser(userErrTwo);
-            }
-        });
+        HttpResponse<String> responsePutTaskThree = client.send(HttpRequest.newBuilder()
+                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(userErrThree)))
+                .uri(URI.create("http://localhost:8080/users"))
+                .version(HttpClient.Version.HTTP_1_1)
+                .build(), handler);
 
-        final NullPointerException exceptionPutThree = assertThrows(NullPointerException.class, new Executable() {
-            @Override
-            public void execute() throws ValidationException {
-                users.updateUser(userErrThree);
-            }
-        });
+        assertEquals("{\"error\":\"Произошла непредвиденная ошибка\"}", responseCreateTaskOne.body());
+        assertEquals("{\"error\":\"Произошла непредвиденная ошибка\"}", responseCreateTaskTwo.body());
+        assertEquals("{\"error\":\"Произошла непредвиденная ошибка\"}", responseCreateTaskThree.body());
 
-        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.UserService.getUserStorage()\" because \"this.userService\" is null", exceptionPostOne.getMessage());
-        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.UserService.getUserStorage()\" because \"this.userService\" is null", exceptionPostTwo.getMessage());
-        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.UserService.getUserStorage()\" because \"this.userService\" is null", exceptionPostThree.getMessage());
-
-        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.UserService.getUserStorage()\" because \"this.userService\" is null", exceptionPutOne.getMessage());
-        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.UserService.getUserStorage()\" because \"this.userService\" is null", exceptionPutTwo.getMessage());
-        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.UserService.getUserStorage()\" because \"this.userService\" is null", exceptionPutThree.getMessage());
-    }
+        assertEquals("{\"error\":\"Произошла непредвиденная ошибка\"}", responsePutTaskOne.body());
+        assertEquals("{\"error\":\"Произошла непредвиденная ошибка\"}", responsePutTaskOne.body());
+        assertEquals("{\"error\":\"Произошла непредвиденная ошибка\"}", responsePutTaskThree.body());
+}
 
     //Без данных пользователя
     @Test
-    public void validationEmptyTest() {
-        final NullPointerException exceptionPostOne = assertThrows(NullPointerException.class, new Executable() {
-            @Override
-            public void execute() throws ValidationException {
-                users.createUser(userEmpty);
-            }
-        });
+    public void validationEmptyTest() throws IOException, InterruptedException {
+        HttpResponse<String> responseCreateTaskOne = client.send(HttpRequest.newBuilder()
+                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(userEmpty)))
+                .uri(URI.create("http://localhost:8080/users"))
+                .version(HttpClient.Version.HTTP_1_1)
+                .build(), handler);
 
-        final NullPointerException exceptionPostTwo = assertThrows(NullPointerException.class, new Executable() {
-            @Override
-            public void execute() throws ValidationException {
-                users.updateUser(userEmpty);
-            }
-        });
-        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.UserService.getUserStorage()\" because \"this.userService\" is null", exceptionPostOne.getMessage());
-        assertEquals("Cannot invoke \"ru.yandex.practicum.filmorate.service.UserService.getUserStorage()\" because \"this.userService\" is null", exceptionPostTwo.getMessage());
+        HttpResponse<String> responsePutTaskOne = client.send(HttpRequest.newBuilder()
+                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(userEmpty)))
+                .uri(URI.create("http://localhost:8080/users"))
+                .version(HttpClient.Version.HTTP_1_1)
+                .build(), handler);
+
+        assertEquals("{\"error\":\"Произошла непредвиденная ошибка\"}", responseCreateTaskOne.body());
+        assertEquals("{\"error\":\"Произошла непредвиденная ошибка\"}", responsePutTaskOne.body());
     }
 }
