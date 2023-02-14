@@ -25,6 +25,7 @@ public class InMemoryUserStorage implements UserStorage {
         return users;
     }
 
+    @Override
     public User findUserId(Integer id) {
         return users.stream()
                 .filter(p -> p.getId() == id)
@@ -36,13 +37,7 @@ public class InMemoryUserStorage implements UserStorage {
     public User createUser(User user) throws ValidationException {
         log.debug("Получен запрос POST /users.");
 
-        if (user.getLogin().contains(" ")) {
-            throw new ValidationException("Логин не может быть пустым и содержать пробелы.");
-        }
-
-        if (user.getName() == null || user.getName().isEmpty()) {
-            user.setName(user.getLogin());
-        }
+        validate(user);
 
         if (user.getFriends() == null) {
             user.setFriends(new HashSet<>());
@@ -59,14 +54,7 @@ public class InMemoryUserStorage implements UserStorage {
     public User updateUser(User user) throws ValidationException {
         log.debug("Получен запрос PUT /users.");
 
-        if (user.getLogin().contains(" ")) {
-            throw new ValidationException("Логин не может быть пустым и содержать пробелы.");
-        }
-
-        if (user.getName() == null || user.getName().isEmpty()) {
-            user.setName(user.getLogin());
-        }
-
+        validate(user);
 
         for (User i : users) {
             if (i.getId() == user.getId()) {
@@ -82,5 +70,14 @@ public class InMemoryUserStorage implements UserStorage {
 
         log.debug("Пользователь обновлен:{}", user);
         return user;
+    }
+
+    private void validate(User user) throws ValidationException {
+        if (user.getLogin().contains(" ")) {
+            throw new ValidationException("Логин не может быть пустым и содержать пробелы.");
+        }
+        if (user.getName() == null || user.getName().isEmpty()) {
+            user.setName(user.getLogin());
+        }
     }
 }
