@@ -19,17 +19,16 @@ public class FilmService {
         this.userStorage = userStorage;
     }
 
+    public FilmStorage getFilmStorage(){return filmStorage;}
     public Integer findAllLikes(Integer filmId) {
-        return filmStorage.findFilm().stream()
-                .filter(p -> p.getId() == filmId)
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException(String.format("Фильм № %d не найден", filmId)))
+        return filmStorage.findFilmId(filmId)
                 .getLikes()
                 .size();
     }
 
     public List<Film> findPopularFilm(Integer count) {
-        return filmStorage.findFilm().stream()
+        return filmStorage.findFilm()
+                .stream()
                 .sorted((p0, p1) -> {
                     if (p0.getLikes().size() > p1.getLikes().size()) {
                         return -1;
@@ -42,39 +41,21 @@ public class FilmService {
     }
 
     public Integer addLike(Integer filmId, Integer userId) {
-        userStorage.findUser().stream()
-                .filter(p -> p.getId() == userId)
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException(String.format("Пользователь № %d не найден", userId)));
-
-        filmStorage.findFilm().stream()
-                .filter(p -> p.getId() == filmId)
-                .findFirst().orElseThrow(() -> new NotFoundException(String.format("Фильм № %d не найден", filmId)))
+        userStorage.findUserId(userId);
+        filmStorage.findFilmId(filmId)
                 .addLikes(userId);
 
-        return filmStorage.findFilm().stream()
-                .filter(p -> p.getId() == filmId)
-                .findFirst().orElseThrow(() -> new NotFoundException(String.format("Фильм № %d не найден", filmId)))
+        return filmStorage.findFilmId(filmId)
                 .getLikes()
                 .size();
     }
 
     public Integer removeLike(Integer filmId, Integer userId) {
-        userStorage.findUser().stream()
-                .filter(p -> p.getId() == userId)
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException(String.format("Пользователь № %d не найден", userId)));
-
-        filmStorage.findFilm().stream()
-                .filter(p -> p.getId() == filmId)
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException(String.format("Фильм № %d не найден", filmId)))
+        userStorage.findUserId(userId);
+        filmStorage.findFilmId(filmId)
                 .removeLikes(userId);
 
-        return filmStorage.findFilm().stream()
-                .filter(p -> p.getId() == filmId)
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException(String.format("Фильм № %d не найден", filmId)))
+        return filmStorage.findFilmId(filmId)
                 .getLikes()
                 .size();
     }
