@@ -27,3 +27,9 @@ Like:
 1. Поставить лайк фильму: PUT http://localhost:8080/films/{filmId}/like/{userId}.
 2. Убрать лайк у фильма: DELETE http://localhost:8080/films/{filmId}/like/{userId}.
 3. Получить списко популярных фильмов: GET http://localhost:8080/films/popular.
+
+# Пример запроса к БД 
+1. Получение всех фильмов: "select * from films"
+2. Получение всех Пользователей: "select * from users"
+3. Получение всех жанров: "select * from gerne"
+4. Получение всех вариантов рейтинг: "select * from mpa"
