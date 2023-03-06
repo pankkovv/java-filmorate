@@ -2,7 +2,7 @@
 Template repository for Filmorate project.
 
 # database-filmorate
-![This is an image](DbFilmorate.jpg)
+![This is an image](DbFilmorate.png)
 
 # Примеры запросов
 User:
