@@ -2,7 +2,7 @@
 Template repository for Filmorate project.
 
 # database-filmorate
-![This is an image](https://github.com/pankkovv/java-filmorate/blob/main/DB-Filmorate.png?raw=true)
+![This is an image](https://github.com/pankkovv/java-filmorate/blob/add-databse/FilmorateER.jpg?raw=true)
 
 # Примеры запросов
 User:
