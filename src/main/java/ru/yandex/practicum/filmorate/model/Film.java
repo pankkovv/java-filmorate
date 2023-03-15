@@ -1,13 +1,19 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import ru.yandex.practicum.filmorate.exception.PostureDate;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.List;
 
 @Data
+@AllArgsConstructor
 @Builder
 public class Film {
     private int id;
@@ -22,13 +28,7 @@ public class Film {
     @NotNull
     @Positive
     private Integer duration;
-    private Set<Integer> likes;
-
-    public void addLikes(Integer userId) {
-        likes.add(userId);
-    }
-
-    public void removeLikes(Integer userId) {
-        likes.remove(userId);
-    }
+    private Integer rate;
+    private Mpa mpa;
+    private List<Genre> genres;
 }

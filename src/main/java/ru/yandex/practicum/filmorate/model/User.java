@@ -4,9 +4,9 @@ import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.Set;
 
 @Data
+@AllArgsConstructor
 @Builder
 public class User {
     private int id;
@@ -20,13 +20,4 @@ public class User {
     @NotNull
     @PastOrPresent
     private LocalDate birthday;
-    private Set<Integer> friends;
-
-    public void addFriends(int userId) {
-        friends.add(userId);
-    }
-
-    public void removeFriends(int userId) {
-        friends.remove(userId);
-    }
 }
