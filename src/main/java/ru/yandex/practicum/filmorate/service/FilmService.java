@@ -1,61 +1,78 @@
 package ru.yandex.practicum.filmorate.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dao.methods.FilmDao;
+import ru.yandex.practicum.filmorate.dao.methods.GenreDao;
+import ru.yandex.practicum.filmorate.dao.methods.MpaDao;
+import ru.yandex.practicum.filmorate.dao.methods.RateDao;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
+import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 public class FilmService {
-    private FilmStorage filmStorage;
-    private UserStorage userStorage;
+    private FilmDao filmDao;
+    private RateDao rateDao;
+    private MpaDao mpaDao;
+    private GenreDao genreDao;
 
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
-        this.filmStorage = filmStorage;
-        this.userStorage = userStorage;
+    @Autowired
+    public FilmService(FilmDao filmDao, RateDao rateDao, MpaDao mpaDao, GenreDao genreDao) {
+        this.filmDao = filmDao;
+        this.rateDao = rateDao;
+        this.mpaDao = mpaDao;
+        this.genreDao = genreDao;
     }
 
-    public FilmStorage getFilmStorage(){return filmStorage;}
-    public Integer findAllLikes(Integer filmId) {
-        return filmStorage.findFilmId(filmId)
-                .getLikes()
-                .size();
+    public List<Film> findAllFilm(){
+        return filmDao.findFilm();
     }
 
-    public List<Film> findPopularFilm(Integer count) {
-        return filmStorage.findFilm()
-                .stream()
-                .sorted((p0, p1) -> {
-                    if (p0.getLikes().size() > p1.getLikes().size()) {
-                        return -1;
-                    } else {
-                        return 1;
-                    }
-                })
-                .limit(count)
-                .collect(Collectors.toList());
+    public Optional<Film> findFilmId(Integer id) {
+        return filmDao.findFilmId(id);
     }
 
-    public Integer addLike(Integer filmId, Integer userId) {
-        userStorage.findUserId(userId);
-        filmStorage.findFilmId(filmId)
-                .addLikes(userId);
-
-        return filmStorage.findFilmId(filmId)
-                .getLikes()
-                .size();
+    public List<Film> findPopularFilm(Integer count){
+        return filmDao.findPopularFilm(count);
     }
 
-    public Integer removeLike(Integer filmId, Integer userId) {
-        userStorage.findUserId(userId);
-        filmStorage.findFilmId(filmId)
-                .removeLikes(userId);
+    public Optional<Film> createFilm(Film film) throws Throwable {
+        return filmDao.createFilm(film);
+    }
 
-        return filmStorage.findFilmId(filmId)
-                .getLikes()
-                .size();
+    public Optional<Film> updateFilm(Film film) throws ValidationException {
+        return filmDao.updateFilm(film);
+    }
+
+    public Optional<Film> addLike(Integer filmId, Integer userId) throws Throwable {
+        return rateDao.addLike(filmId, userId);
+    }
+
+    public Optional<Film> removeLike(Integer filmId, Integer userId) throws Throwable {
+        return rateDao.removeLike(filmId, userId);
+    }
+
+    public List<Mpa> findMpa(){
+        return mpaDao.findMpa();
+    }
+
+    public Optional<Mpa> findMpaId(Integer id){
+        return mpaDao.findMpaId(id);
+    }
+
+    public List<Genre> findGenre(){
+        return genreDao.findGenre();
+    }
+
+    public Optional<Genre> findGenreId(Integer id){
+        return genreDao.findGenreId(id);
     }
 }

@@ -2,64 +2,53 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dao.methods.FriendsDao;
+import ru.yandex.practicum.filmorate.dao.methods.UserDao;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
-    private UserStorage userStorage;
+    private UserDao userDao;
+    private FriendsDao friendsDao;
 
     @Autowired
-    public UserService(UserStorage userStorage) {
-        this.userStorage = userStorage;
+    public UserService(UserDao userDao, FriendsDao friendsDao) {
+        this.userDao = userDao;
+        this.friendsDao = friendsDao;
     }
 
-    public UserStorage getUserStorage(){return userStorage;}
-    public List<User> findFriendsUserId(Integer id) {
-        return userStorage.findUser()
-                .stream()
-                .filter(s -> userStorage
-                        .findUserId(id)
-                        .getFriends()
-                        .contains(s.getId()))
-                .collect(Collectors.toList());
+    public List<User> findUser(){
+        return userDao.findUser();
     }
 
-    public List<User> findCommonFriends(Integer id, Integer otherId) {
-        Set<Integer> setCommonFriend = userStorage.findUserId(id)
-                .getFriends()
-                .stream()
-                .filter(s -> userStorage
-                        .findUserId(otherId)
-                        .getFriends()
-                        .contains(s))
-                .collect(Collectors.toSet());
-
-        return userStorage.findUser().stream()
-                .filter(s -> setCommonFriend.contains(s.getId()))
-                .collect(Collectors.toList());
+    public Optional<User> findUserId(Integer id) {
+        return userDao.findUserId(id);
     }
 
-    public Set<Integer> addFriend(Integer userOneId, Integer userTwoId) {
-        userStorage.findUserId(userTwoId)
-                .addFriends(userOneId);
-        userStorage.findUserId(userOneId)
-                .addFriends(userTwoId);
-
-        return userStorage.findUserId(userOneId)
-                .getFriends();
+    public Optional<User> createUser(User user) throws ValidationException {
+        return userDao.createUser(user);
     }
 
-    public Set<Integer> deleteFriend(Integer userOneId, Integer userTwoId) {
-        userStorage.findUserId(userTwoId)
-                .removeFriends(userOneId);
-        userStorage.findUserId(userOneId)
-                .removeFriends(userTwoId);
+    public Optional<User> updateUser(User user) throws ValidationException {
+        return userDao.updateUser(user);
+    }
 
-        return userStorage.findUserId(userOneId)
-                .getFriends();
+    public List<User> findFriendsUserId(Integer id){
+        return friendsDao.findFriendsUserId(id);
+    }
+
+    public List<User> findCommonFriends(Integer id, Integer otherId){
+        return friendsDao.findCommonFriends(id, otherId);
+    }
+
+    public List<User> addFriend(Integer userOneId, Integer userTwoId) throws Throwable {
+        return friendsDao.addFriend(userOneId, userTwoId);
+    }
+
+    public List<User> deleteFriend(Integer userOneId, Integer userTwoId) throws Throwable {
+        return friendsDao.deleteFriend(userOneId, userTwoId);
     }
 }
