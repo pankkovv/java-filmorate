@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,12 +28,12 @@ public class FilmController {
     }
 
     @GetMapping("/{id}")
-    public Optional<Film> findFilmId(@PathVariable int id) throws SQLException {
+    public Optional<Film> findFilmId(@PathVariable int id) {
         return filmService.findFilmId(id);
     }
 
     @PostMapping
-    public Optional<Film> createFilm(@Valid @RequestBody Film film) throws Throwable {
+    public Optional<Film> createFilm(@Valid @RequestBody Film film) throws ValidationException {
         return filmService.createFilm(film);
     }
 
@@ -50,13 +49,13 @@ public class FilmController {
     }
 
     @PutMapping("/{filmId}/like/{userId}")
-    public Optional<Film> addLike(@PathVariable int filmId, @PathVariable int userId) throws Throwable {
+    public Optional<Film> addLike(@PathVariable int filmId, @PathVariable int userId) {
         return filmService.addLike(filmId, userId);
     }
 
 
     @DeleteMapping("/{filmId}/like/{userId}")
-    public Optional<Film> removeLike(@PathVariable int filmId, @PathVariable int userId) throws Throwable {
+    public Optional<Film> removeLike(@PathVariable int filmId, @PathVariable int userId) {
         return filmService.removeLike(filmId, userId);
     }
 }

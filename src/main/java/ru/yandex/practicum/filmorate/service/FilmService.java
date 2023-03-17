@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.methods.FilmDao;
 import ru.yandex.practicum.filmorate.dao.methods.GenreDao;
@@ -12,8 +11,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
-import java.sql.SQLException;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,7 +29,7 @@ public class FilmService {
         this.genreDao = genreDao;
     }
 
-    public List<Film> findAllFilm(){
+    public List<Film> findAllFilm() {
         return filmDao.findFilm();
     }
 
@@ -40,11 +37,11 @@ public class FilmService {
         return filmDao.findFilmId(id);
     }
 
-    public List<Film> findPopularFilm(Integer count){
+    public List<Film> findPopularFilm(Integer count) {
         return filmDao.findPopularFilm(count);
     }
 
-    public Optional<Film> createFilm(Film film) throws Throwable {
+    public Optional<Film> createFilm(Film film) throws ValidationException {
         return filmDao.createFilm(film);
     }
 
@@ -52,27 +49,27 @@ public class FilmService {
         return filmDao.updateFilm(film);
     }
 
-    public Optional<Film> addLike(Integer filmId, Integer userId) throws Throwable {
+    public Optional<Film> addLike(Integer filmId, Integer userId) {
         return rateDao.addLike(filmId, userId);
     }
 
-    public Optional<Film> removeLike(Integer filmId, Integer userId) throws Throwable {
+    public Optional<Film> removeLike(Integer filmId, Integer userId) {
         return rateDao.removeLike(filmId, userId);
     }
 
-    public List<Mpa> findMpa(){
+    public List<Mpa> findMpa() {
         return mpaDao.findMpa();
     }
 
-    public Optional<Mpa> findMpaId(Integer id){
+    public Optional<Mpa> findMpaId(Integer id) {
         return mpaDao.findMpaId(id);
     }
 
-    public List<Genre> findGenre(){
+    public List<Genre> findGenre() {
         return genreDao.findGenre();
     }
 
-    public Optional<Genre> findGenreId(Integer id){
+    public Optional<Genre> findGenreId(Integer id) {
         return genreDao.findGenreId(id);
     }
 }

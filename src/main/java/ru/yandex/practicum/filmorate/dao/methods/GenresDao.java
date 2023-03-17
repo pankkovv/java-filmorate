@@ -7,7 +7,7 @@ import java.util.List;
 public interface GenresDao {
     List<Genre> findGenresFilmId(long id);
 
-    void addGenresFilm(long filmId, long genresId);
+    void addGenresFilm(long filmId, List<Genre> listGenresFilm);
 
     void removeGenresFilm(long filmId);
 }

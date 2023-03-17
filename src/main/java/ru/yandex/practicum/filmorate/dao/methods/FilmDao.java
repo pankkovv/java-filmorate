@@ -14,7 +14,7 @@ public interface FilmDao {
 
     List<Film> findPopularFilm(Integer count);
 
-    Optional<Film> createFilm(Film film);
+    Optional<Film> createFilm(Film film) throws ValidationException;
 
     Optional<Film> updateFilm(Film film) throws ValidationException;
 
