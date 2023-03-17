@@ -30,26 +30,21 @@ public class GenreDbStorage implements GenreDao {
     }
 
     private Genre makeGenre(ResultSet rs) throws SQLException {
-        Integer id = rs.getInt("id");
-        String name = rs.getString("name");
-
-        return new Genre(id, name);
+        return Genre.builder().id(rs.getInt("id")).name(rs.getString("name")).build();
     }
 
     @Override
     public Optional<Genre> findGenreId(long id) {
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from genre where id = ?", id);
         if (filmRows.next()) {
-            Genre genre = new Genre(
-                    filmRows.getInt("id"),
-                    filmRows.getString("name")
-            );
+            Genre genre = Genre.builder().id(filmRows.getInt("id")).name(filmRows.getString("name")).build();
 
             log.info("Найден жанр: {} {}", genre.getId(), genre.getName());
 
             return Optional.of(genre);
         } else {
             log.info("Жанр с идентификатором {} не найден.", id);
+
             throw new NotFoundException("Жанр с идентификатором " + id + " не найден.");
         }
     }

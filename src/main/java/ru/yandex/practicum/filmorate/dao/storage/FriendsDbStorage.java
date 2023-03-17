@@ -7,11 +7,11 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.methods.FriendsDao;
 import ru.yandex.practicum.filmorate.dao.methods.UserDao;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -39,17 +39,11 @@ public class FriendsDbStorage implements FriendsDao {
     }
 
     private User makeUsers(ResultSet rs) throws SQLException {
-        Integer id = rs.getInt("id");
-        String email = rs.getString("email");
-        String login = rs.getString("login");
-        String name = rs.getString("name");
-        LocalDate birthday = rs.getDate("birthday").toLocalDate();
-
-        return new User(id, email, login, name, birthday);
+        return User.builder().id(rs.getInt("id")).email(rs.getString("email")).login(rs.getString("login")).name(rs.getString("name")).birthday(rs.getDate("birthday").toLocalDate()).build();
     }
 
     @Override
-    public List<User> addFriend(long userOneId, long userTwoId) {
+    public List<User> addFriend(long userOneId, long userTwoId) throws ValidationException {
         try {
             if (!validateExists(userOneId, userTwoId)) {
                 int friendAdd = jdbcTemplate.update("INSERT INTO friends (user_id, friend_id) VALUES (?,?)",
@@ -59,13 +53,13 @@ public class FriendsDbStorage implements FriendsDao {
                 return findFriendsUserId(userOneId);
             }
         } catch (DataAccessException e) {
-            throw new RuntimeException();
+            throw new ValidationException();
         }
         return List.of();
     }
 
     @Override
-    public List<User> deleteFriend(long userOneId, long userTwoId) {
+    public List<User> deleteFriend(long userOneId, long userTwoId) throws ValidationException {
         try {
             if (validateExists(userOneId, userTwoId)) {
                 int friendAdd = jdbcTemplate.update("DELETE friends WHERE user_id = ? AND friend_id = ?",
@@ -75,7 +69,7 @@ public class FriendsDbStorage implements FriendsDao {
                 return findFriendsUserId(userOneId);
             }
         } catch (DataAccessException e) {
-            throw new RuntimeException();
+            throw new ValidationException();
         }
         return List.of();
     }

@@ -20,8 +20,6 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
 
 @Slf4j
 @Component("film")
@@ -49,16 +47,7 @@ public class FilmDbStorage implements FilmDao {
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from films where id = ?", id);
 
         if (filmRows.next()) {
-            Film film = new Film(
-                    filmRows.getInt("id"),
-                    filmRows.getString("name"),
-                    filmRows.getString("description"),
-                    filmRows.getDate("release_date").toLocalDate(),
-                    filmRows.getInt("duration"),
-                    filmRows.getInt("rate"),
-                    mpaDao.findMpaId(filmRows.getInt("mpa_id")).get(),
-                    genresDao.findGenresFilmId(filmRows.getInt("id"))
-            );
+            Film film = Film.builder().id(filmRows.getInt("id")).name(filmRows.getString("name")).description(filmRows.getString("description")).releaseDate(filmRows.getDate("release_date").toLocalDate()).duration(filmRows.getInt("duration")).rate(filmRows.getInt("rate")).mpa(mpaDao.findMpaId(filmRows.getInt("mpa_id")).get()).genres(genresDao.findGenresFilmId(filmRows.getInt("id"))).build();
 
             log.info("Найден фильм: {} {}", film.getId(), film.getName());
 
@@ -77,29 +66,21 @@ public class FilmDbStorage implements FilmDao {
     }
 
     @Override
-    public Optional<Film> createFilm(Film film) {
+    public Optional<Film> createFilm(Film film) throws ValidationException {
         try {
             validate(film);
             film.setId(localId);
             localId++;
 
-            int filmAdd = jdbcTemplate.update("INSERT INTO films (name, description, release_date, duration, rate, mpa_id) VALUES (?,?,?,?,?,?)",
-                    film.getName(),
-                    film.getDescription(),
-                    film.getReleaseDate(),
-                    film.getDuration(),
-                    film.getRate(),
-                    film.getMpa().getId());
+            int filmAdd = jdbcTemplate.update("INSERT INTO films (name, description, release_date, duration, rate, mpa_id) VALUES (?,?,?,?,?,?)", film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getRate(), film.getMpa().getId());
 
             if (!film.getGenres().isEmpty()) {
-                for (Genre g : film.getGenres()) {
-                    genresDao.addGenresFilm(film.getId(), g.getId());
-                }
+                genresDao.addGenresFilm(film.getId(), film.getGenres());
             }
 
             return findFilmId(film.getId());
         } catch (DataAccessException e) {
-            throw new RuntimeException();
+            throw new ValidationException();
         }
     }
 
@@ -113,22 +94,10 @@ public class FilmDbStorage implements FilmDao {
                 genresDao.removeGenresFilm(film.getId());
             } else {
                 genresDao.removeGenresFilm(film.getId());
-                Set<Genre> setGenre = new TreeSet<>(this::compare);
-                setGenre.addAll(film.getGenres());
-                for (Genre g : setGenre) {
-                    genresDao.addGenresFilm(film.getId(), g.getId());
-                }
+                genresDao.addGenresFilm(film.getId(), film.getGenres());
             }
 
-            int filmUpdate = jdbcTemplate.update("UPDATE films SET name = ?, description = ?, release_date = ?, duration = ?, rate = ?, mpa_id = ? WHERE id = ?",
-                    film.getName(),
-                    film.getDescription(),
-                    film.getReleaseDate(),
-                    film.getDuration(),
-                    film.getRate(),
-                    film.getMpa().getId(),
-                    film.getId()
-            );
+            int filmUpdate = jdbcTemplate.update("UPDATE films SET name = ?, description = ?, release_date = ?, duration = ?, rate = ?, mpa_id = ? WHERE id = ?", film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getRate(), film.getMpa().getId(), film.getId());
 
             return findFilmId(film.getId());
         } catch (DataAccessException e) {
@@ -137,16 +106,7 @@ public class FilmDbStorage implements FilmDao {
     }
 
     private Film makeFilms(ResultSet rs) throws SQLException {
-        Integer id = rs.getInt("id");
-        String name = rs.getString("name");
-        String description = rs.getString("description");
-        LocalDate releaseDate = rs.getDate("release_date").toLocalDate();
-        Integer duration = rs.getInt("duration");
-        Integer rate = rs.getInt("rate");
-        Mpa mpa = mpaDao.findMpaId(rs.getInt("mpa_id")).get();
-        List<Genre> genres = genresDao.findGenresFilmId(rs.getInt("id"));
-
-        return new Film(id, name, description, releaseDate, duration, rate, mpa, genres);
+        return Film.builder().id(rs.getInt("id")).name(rs.getString("name")).description(rs.getString("description")).releaseDate(rs.getDate("release_date").toLocalDate()).duration(rs.getInt("duration")).rate(rs.getInt("rate")).mpa(mpaDao.findMpaId(rs.getInt("mpa_id")).get()).genres(genresDao.findGenresFilmId(rs.getInt("id"))).build();
     }
 
     void validate(Film film) {
@@ -155,16 +115,6 @@ public class FilmDbStorage implements FilmDao {
         }
         if (film.getRate() == null) {
             film.setRate(0);
-        }
-    }
-
-    int compare(Genre p0, Genre p1) {
-        if(p0.getId() > p1.getId()){
-            return 1;
-        } else if (p0.getId() == p1.getId()){
-            return 0;
-        } else {
-            return -1;
         }
     }
 }

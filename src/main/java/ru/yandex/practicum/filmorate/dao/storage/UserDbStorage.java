@@ -12,7 +12,6 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,12 +36,7 @@ public class UserDbStorage implements UserDao {
     public Optional<User> findUserId(long id) {
         SqlRowSet userRows = jdbcTemplate.queryForRowSet("select * from users where id = ?", id);
         if (userRows.next()) {
-            User user = new User(
-                    userRows.getInt("id"),
-                    userRows.getString("email"),
-                    userRows.getString("login"),
-                    userRows.getString("name"),
-                    userRows.getDate("birthday").toLocalDate());
+            User user = User.builder().id(userRows.getInt("id")).email(userRows.getString("email")).login(userRows.getString("login")).name(userRows.getString("name")).birthday(userRows.getDate("birthday").toLocalDate()).build();
 
             log.info("Найден пользователь: {} {}", user.getId(), user.getName());
 
@@ -61,12 +55,7 @@ public class UserDbStorage implements UserDao {
             user.setId(localInt);
             localInt++;
 
-            int userAdd = jdbcTemplate.update("INSERT INTO users (id, login, name, email, birthday) VALUES (?,?,?,?,?)",
-                    user.getId(),
-                    user.getLogin(),
-                    user.getName(),
-                    user.getEmail(),
-                    user.getBirthday());
+            int userAdd = jdbcTemplate.update("INSERT INTO users (id, login, name, email, birthday) VALUES (?,?,?,?,?)", user.getId(), user.getLogin(), user.getName(), user.getEmail(), user.getBirthday());
 
             return findUserId(user.getId());
         } catch (DataAccessException e) {
@@ -80,12 +69,7 @@ public class UserDbStorage implements UserDao {
             validate(user);
             findUserId(user.getId());
 
-            int userUpdate = jdbcTemplate.update("UPDATE users SET login = ?, name = ?, email = ?, birthday = ? WHERE id = ?",
-                    user.getLogin(),
-                    user.getName(),
-                    user.getEmail(),
-                    user.getBirthday(),
-                    user.getId());
+            int userUpdate = jdbcTemplate.update("UPDATE users SET login = ?, name = ?, email = ?, birthday = ? WHERE id = ?", user.getLogin(), user.getName(), user.getEmail(), user.getBirthday(), user.getId());
 
             return findUserId(user.getId());
         } catch (DataAccessException e) {
@@ -94,13 +78,7 @@ public class UserDbStorage implements UserDao {
     }
 
     private User makeUsers(ResultSet rs) throws SQLException {
-        Integer id = rs.getInt("id");
-        String email = rs.getString("email");
-        String login = rs.getString("login");
-        String name = rs.getString("name");
-        LocalDate birthday = rs.getDate("birthday").toLocalDate();
-
-        return new User(id, email, login, name, birthday);
+        return User.builder().id(rs.getInt("id")).email(rs.getString("email")).login(rs.getString("login")).name(rs.getString("name")).birthday(rs.getDate("birthday").toLocalDate()).build();
     }
 
     private void validate(User user) {

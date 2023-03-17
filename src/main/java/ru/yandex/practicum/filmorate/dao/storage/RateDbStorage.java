@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.dao.methods.FilmDao;
 import ru.yandex.practicum.filmorate.dao.methods.RateDao;
 import ru.yandex.practicum.filmorate.dao.methods.UserDao;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.sql.ResultSet;
@@ -34,18 +35,12 @@ public class RateDbStorage implements RateDao {
     public Optional<Film> addLike(long filmId, long userId) {
         try {
             if (!validateExists(filmId, userId)) {
-                int rateAdd = jdbcTemplate.update("INSERT INTO rate (film_id, user_id) VALUES (?,?)",
-                        filmId,
-                        userId
-                );
-
-                int filmRateAdd = jdbcTemplate.update("UPDATE films SET rate = rate + 1 WHERE id = ?",
-                        filmId
-                );
+                int rateAdd = jdbcTemplate.update("INSERT INTO rate (film_id, user_id) VALUES (?,?)", filmId, userId);
+                int filmRateAdd = jdbcTemplate.update("UPDATE films SET rate = rate + 1 WHERE id = ?", filmId);
             }
             return filmDao.findFilmId(filmId);
         } catch (DataAccessException e) {
-            throw new RuntimeException();
+            throw new ValidationException();
         }
     }
 
@@ -53,18 +48,12 @@ public class RateDbStorage implements RateDao {
     public Optional<Film> removeLike(long filmId, long userId) {
         try {
             if (validateExists(filmId, userId)) {
-                int rateRemove = jdbcTemplate.update("DELETE FROM rate WHERE film_id = ? AND user_id = ?",
-                        filmId,
-                        userId
-                );
-
-                int filmRateRemove = jdbcTemplate.update("UPDATE films SET rate = rate - 1 WHERE id = ?",
-                        filmId
-                );
+                int rateRemove = jdbcTemplate.update("DELETE FROM rate WHERE film_id = ? AND user_id = ?", filmId, userId);
+                int filmRateRemove = jdbcTemplate.update("UPDATE films SET rate = rate - 1 WHERE id = ?", filmId);
             }
             return filmDao.findFilmId(filmId);
         } catch (DataAccessException e) {
-            throw new RuntimeException();
+            throw new ValidationException();
         }
     }
 
@@ -74,8 +63,7 @@ public class RateDbStorage implements RateDao {
     }
 
     private long makeUser(ResultSet rs) throws SQLException {
-        long id = rs.getLong("user_id");
-        return id;
+        return rs.getLong("user_id");
     }
 
     private boolean validateExists(long filmId, long userId) throws NotFoundException {

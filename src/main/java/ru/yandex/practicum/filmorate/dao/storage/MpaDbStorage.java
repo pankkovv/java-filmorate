@@ -30,20 +30,14 @@ public class MpaDbStorage implements MpaDao {
     }
 
     private Mpa makeMpa(ResultSet rs) throws SQLException {
-        Integer id = rs.getInt("id");
-        String name = rs.getString("name");
-
-        return new Mpa(id, name);
+        return Mpa.builder().id(rs.getInt("id")).name(rs.getString("name")).build();
     }
 
     @Override
     public Optional<Mpa> findMpaId(long id) {
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from mpa where id = ?", id);
         if (filmRows.next()) {
-            Mpa mpa = new Mpa(
-                    filmRows.getInt("id"),
-                    filmRows.getString("name")
-            );
+            Mpa mpa = Mpa.builder().id(filmRows.getInt("id")).name(filmRows.getString("name")).build();
 
             log.info("Найден рейтинг: {} {}", mpa.getId(), mpa.getName());
 

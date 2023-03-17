@@ -11,6 +11,8 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 @Slf4j
 @Component("genres")
@@ -32,19 +34,30 @@ public class GenresDbStorage implements GenresDao {
     }
 
     private Genre makeGenresId(ResultSet rs) throws SQLException {
-        Integer genreId = rs.getInt("genre_id");
-        return genreDao.findGenreId(genreId).get();
+        return genreDao.findGenreId(rs.getInt("genre_id")).get();
     }
 
     @Override
-    public void addGenresFilm(long filmId, long genreId) {
-        int filmAdd = jdbcTemplate.update("INSERT INTO genres (film_id, genre_id) VALUES (?,?)",
-                filmId,
-                genreId);
+    public void addGenresFilm(long filmId, List<Genre> listGenresFilm) {
+        Set<Genre> setGenre = new TreeSet<>(this::compare);
+        setGenre.addAll(listGenresFilm);
+        for (Genre g : setGenre) {
+            int filmAdd = jdbcTemplate.update("INSERT INTO genres (film_id, genre_id) VALUES (?,?)", filmId, g.getId());
+        }
     }
 
     @Override
     public void removeGenresFilm(long filmId) {
         int genresRemove = jdbcTemplate.update("DELETE genres WHERE film_id = ?", filmId);
+    }
+
+    int compare(Genre p0, Genre p1) {
+        if (p0.getId() > p1.getId()) {
+            return 1;
+        } else if (p0.getId() == p1.getId()) {
+            return 0;
+        } else {
+            return -1;
+        }
     }
 }
