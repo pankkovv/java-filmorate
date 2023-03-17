@@ -155,7 +155,7 @@ class FilmorateApplicationTests {
                 .isEqualTo(List.of());
 
         //add genres to film
-        genresStorage.addGenresFilm(film.getId(), film.getGenres());
+        genresStorage.addGenresFilm(film.getId(), List.of(genreStorage.findGenreId(1).get()));
         List<Genre> genresFilmAdd = genresStorage.findGenresFilmId(film.getId());
 
         assertThat(genresFilmAdd)
