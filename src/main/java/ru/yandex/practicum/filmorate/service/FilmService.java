@@ -6,7 +6,6 @@ import ru.yandex.practicum.filmorate.dao.methods.FilmDao;
 import ru.yandex.practicum.filmorate.dao.methods.GenreDao;
 import ru.yandex.practicum.filmorate.dao.methods.MpaDao;
 import ru.yandex.practicum.filmorate.dao.methods.RateDao;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -41,11 +40,11 @@ public class FilmService {
         return filmDao.findPopularFilm(count);
     }
 
-    public Optional<Film> createFilm(Film film) throws ValidationException {
+    public Optional<Film> createFilm(Film film) {
         return filmDao.createFilm(film);
     }
 
-    public Optional<Film> updateFilm(Film film) throws ValidationException {
+    public Optional<Film> updateFilm(Film film) {
         return filmDao.updateFilm(film);
     }
 

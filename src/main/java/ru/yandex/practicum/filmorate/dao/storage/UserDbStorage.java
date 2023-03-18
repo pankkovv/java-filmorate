@@ -49,7 +49,7 @@ public class UserDbStorage implements UserDao {
     }
 
     @Override
-    public Optional<User> createUser(User user) throws ValidationException {
+    public Optional<User> createUser(User user) {
         try {
             validate(user);
             user.setId(localInt);
@@ -59,12 +59,12 @@ public class UserDbStorage implements UserDao {
 
             return findUserId(user.getId());
         } catch (DataAccessException e) {
-            throw new ValidationException();
+            throw new ValidationException(e.getMessage());
         }
     }
 
     @Override
-    public Optional<User> updateUser(User user) throws ValidationException {
+    public Optional<User> updateUser(User user) {
         try {
             validate(user);
             findUserId(user.getId());
@@ -73,7 +73,7 @@ public class UserDbStorage implements UserDao {
 
             return findUserId(user.getId());
         } catch (DataAccessException e) {
-            throw new ValidationException();
+            throw new ValidationException(e.getMessage());
         }
     }
 

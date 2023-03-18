@@ -6,8 +6,8 @@ import ru.yandex.practicum.filmorate.dao.methods.FriendsDao;
 import ru.yandex.practicum.filmorate.dao.methods.UserDao;
 import ru.yandex.practicum.filmorate.model.User;
 
-import javax.xml.bind.ValidationException;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -44,11 +44,11 @@ public class UserService {
         return friendsDao.findCommonFriends(id, otherId);
     }
 
-    public List<User> addFriend(Integer userOneId, Integer userTwoId) throws ValidationException {
+    public List<User> addFriend(Integer userOneId, Integer userTwoId) {
         return friendsDao.addFriend(userOneId, userTwoId);
     }
 
-    public List<User> deleteFriend(Integer userOneId, Integer userTwoId) throws ValidationException {
+    public List<User> deleteFriend(Integer userOneId, Integer userTwoId) {
         return friendsDao.deleteFriend(userOneId, userTwoId);
     }
 }

@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -33,12 +32,12 @@ public class FilmController {
     }
 
     @PostMapping
-    public Optional<Film> createFilm(@Valid @RequestBody Film film) throws ValidationException {
+    public Optional<Film> createFilm(@Valid @RequestBody Film film) {
         return filmService.createFilm(film);
     }
 
     @PutMapping
-    public Optional<Film> updateFilm(@Valid @RequestBody Film film) throws ValidationException {
+    public Optional<Film> updateFilm(@Valid @RequestBody Film film) {
         return filmService.updateFilm(film);
     }
 

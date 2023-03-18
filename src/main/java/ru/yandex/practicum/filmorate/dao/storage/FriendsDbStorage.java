@@ -43,7 +43,7 @@ public class FriendsDbStorage implements FriendsDao {
     }
 
     @Override
-    public List<User> addFriend(long userOneId, long userTwoId) throws ValidationException {
+    public List<User> addFriend(long userOneId, long userTwoId) {
         try {
             if (!validateExists(userOneId, userTwoId)) {
                 int friendAdd = jdbcTemplate.update("INSERT INTO friends (user_id, friend_id) VALUES (?,?)",
@@ -53,13 +53,13 @@ public class FriendsDbStorage implements FriendsDao {
                 return findFriendsUserId(userOneId);
             }
         } catch (DataAccessException e) {
-            throw new ValidationException();
+            throw new ValidationException(e.getMessage());
         }
         return List.of();
     }
 
     @Override
-    public List<User> deleteFriend(long userOneId, long userTwoId) throws ValidationException {
+    public List<User> deleteFriend(long userOneId, long userTwoId) {
         try {
             if (validateExists(userOneId, userTwoId)) {
                 int friendAdd = jdbcTemplate.update("DELETE friends WHERE user_id = ? AND friend_id = ?",
@@ -69,7 +69,7 @@ public class FriendsDbStorage implements FriendsDao {
                 return findFriendsUserId(userOneId);
             }
         } catch (DataAccessException e) {
-            throw new ValidationException();
+            throw new ValidationException(e.getMessage());
         }
         return List.of();
     }

@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
-import javax.xml.bind.ValidationException;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,12 +52,12 @@ public class UserController {
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public List<User> newFriend(@PathVariable int id, @PathVariable int friendId) throws ValidationException {
+    public List<User> newFriend(@PathVariable int id, @PathVariable int friendId) {
         return userService.addFriend(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public List<User> deleteFriend(@PathVariable int id, @PathVariable int friendId) throws ValidationException {
+    public List<User> deleteFriend(@PathVariable int id, @PathVariable int friendId) {
         return userService.deleteFriend(id, friendId);
     }
 }

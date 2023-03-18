@@ -40,7 +40,7 @@ public class RateDbStorage implements RateDao {
             }
             return filmDao.findFilmId(filmId);
         } catch (DataAccessException e) {
-            throw new ValidationException();
+            throw new ValidationException(e.getMessage());
         }
     }
 
@@ -53,7 +53,7 @@ public class RateDbStorage implements RateDao {
             }
             return filmDao.findFilmId(filmId);
         } catch (DataAccessException e) {
-            throw new ValidationException();
+            throw new ValidationException(e.getMessage());
         }
     }
 

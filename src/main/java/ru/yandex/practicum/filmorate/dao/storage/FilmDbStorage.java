@@ -12,12 +12,9 @@ import ru.yandex.practicum.filmorate.dao.methods.MpaDao;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,7 +40,7 @@ public class FilmDbStorage implements FilmDao {
     }
 
     @Override
-    public Optional<Film> findFilmId(long id) throws NotFoundException {
+    public Optional<Film> findFilmId(long id) {
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet("select * from films where id = ?", id);
 
         if (filmRows.next()) {
@@ -66,7 +63,7 @@ public class FilmDbStorage implements FilmDao {
     }
 
     @Override
-    public Optional<Film> createFilm(Film film) throws ValidationException {
+    public Optional<Film> createFilm(Film film) {
         try {
             validate(film);
             film.setId(localId);
@@ -80,12 +77,12 @@ public class FilmDbStorage implements FilmDao {
 
             return findFilmId(film.getId());
         } catch (DataAccessException e) {
-            throw new ValidationException();
+            throw new ValidationException(e.getMessage());
         }
     }
 
     @Override
-    public Optional<Film> updateFilm(Film film) throws ValidationException {
+    public Optional<Film> updateFilm(Film film) {
         try {
             validate(film);
             findFilmId(film.getId());
@@ -101,7 +98,7 @@ public class FilmDbStorage implements FilmDao {
 
             return findFilmId(film.getId());
         } catch (DataAccessException e) {
-            throw new ValidationException();
+            throw new ValidationException(e.getMessage());
         }
     }
 

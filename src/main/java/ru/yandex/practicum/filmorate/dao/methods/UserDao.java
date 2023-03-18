@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.dao.methods;
 
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
@@ -11,7 +10,7 @@ public interface UserDao {
 
     Optional<User> findUserId(long id);
 
-    Optional<User> createUser(User user) throws ValidationException;
+    Optional<User> createUser(User user);
 
-    Optional<User> updateUser(User user) throws ValidationException;
+    Optional<User> updateUser(User user);
 }

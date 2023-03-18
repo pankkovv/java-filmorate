@@ -44,6 +44,7 @@ public class MpaDbStorage implements MpaDao {
             return Optional.of(mpa);
         } else {
             log.info("Рейтинг с идентификатором {} не найден.", id);
+
             throw new NotFoundException("Рейтинг с идентификатором " + id + " не найден.");
         }
     }
