@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.exception;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
-public class ValidationException extends Throwable {
+public class ValidationException extends RuntimeException {
     private String message;
 
     public ValidationException() {
