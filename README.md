@@ -1,4 +1,4 @@
-# java-filmorate
+#### java-filmorate
 ---
 ### Приложение соцсеть для оценивания фильмов 
 
@@ -9,10 +9,10 @@
 4. Пользователи могут просматривать список общих друзей с другим пользователем;
 5. Ранжировать фильмы по рейтингу.
 
-#### database-filmorate
+## database-filmorate
 ![FilmorateER data][(https://github.com/pankkovv/java-filmorate/blob/main/FilmorateER.jpg)
 
-#### Примеры запросов
+## Примеры запросов
 User:
 1. Создание нового пользователя: POST http://localhost:8080/users, в Request Body json с данными пользователя.
 2. Обновление пользователя: PUT http://localhost:8080/users, в Request Body json с данными пользователя.
