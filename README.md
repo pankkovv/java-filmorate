@@ -5,11 +5,12 @@
 REST API создано на базе Spring Boot.
 
 Приложение имеет следующие функции:
-1. Хранить фильмы и пользователей в БД;
-2. Пользователь может ставить/убирать оценки фильмам;
-3. Пользователи могут добавлять/убирать другого пользоватлея в друзья;
-4. Пользователи могут просматривать список общих друзей с другим пользователем;
-5. Ранжировать фильмы по рейтингу.
+1. Создавать фильмы и пользователей;
+2. Хранить данные в БД;
+3. Пользователь может ставить/убирать оценки фильмам;
+4. Пользователь может добавлять/убирать другого пользователя в друзья;
+5. Пользователь может просматривать список общих друзей с другими пользователеми;
+6. Показывать список фильмов, ранжированных по рейтингу.
 
 ### database-filmorate
 ![FilmorateER data][(https://github.com/pankkovv/java-filmorate/blob/main/FilmorateER.jpg)
@@ -23,7 +24,7 @@ User:
 
 Film:
 1. Создание нового фильма: POST http://localhost:8080/films, в Request Body json с данными фильма.
-2. Обновление фильма: PUT http://localhost:8080/films, в Request Body json с данными фильма.
+2. Обновление данных фильма: PUT http://localhost:8080/films, в Request Body json с данными фильма.
 3. Получние списка фильмов: GET http://localhost:8080/films.
 4. Получние фильма по id: GET http://localhost:8080/films/{id}.
 
@@ -34,8 +35,8 @@ Friends:
 4. Удаление пользователя из списка друзей: DELETE http://localhost:8080/users/{id}/friends/{friendId}.
 
 Like:
-1. Поставить лайк фильму: PUT http://localhost:8080/films/{filmId}/like/{userId}.
-2. Убрать лайк у фильма: DELETE http://localhost:8080/films/{filmId}/like/{userId}.
+1. Поставить оценку фильму: PUT http://localhost:8080/films/{filmId}/like/{userId}.
+2. Убрать оценку у фильма: DELETE http://localhost:8080/films/{filmId}/like/{userId}.
 3. Получить списко популярных фильмов: GET http://localhost:8080/films/popular.
 
 ### Пример запроса к БД
