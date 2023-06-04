@@ -5,12 +5,12 @@
 REST API создано на базе Spring Boot.
 
 Приложение имеет следующие функции:
-1. Создавать фильмы и пользователей;
-2. Хранить данные в БД;
-3. Пользователь может ставить/убирать оценки фильмам;
-4. Пользователь может добавлять/убирать другого пользователя в друзья;
-5. Пользователь может просматривать список общих друзей с другими пользователеми;
-6. Показывать список фильмов, ранжированных по рейтингу.
+1. Создание фильмов и пользователей;
+2. Хранение данных в БД;
+3. Возможность ставить/убирать оценки фильмам;
+4. Возможность добавления/удаления друзей;
+5. Возможность просмотра список общих друзей с другими пользователеми;
+6. Отображение списка фильмов, ранжированных по рейтингу.
 
 ### database-filmorate
 ![FilmorateER data][(https://github.com/pankkovv/java-filmorate/blob/main/FilmorateER.jpg)
@@ -19,33 +19,33 @@ REST API создано на базе Spring Boot.
 User:
 1. Создание нового пользователя: POST http://localhost:8080/users, в Request Body json с данными пользователя.
 2. Обновление пользователя: PUT http://localhost:8080/users, в Request Body json с данными пользователя.
-3. Получние списка пользователей: GET http://localhost:8080/users.
-4. Получние пользователя по id: GET http://localhost:8080/users/{id}.
+3. Получение списка пользователей: GET http://localhost:8080/users.
+4. Получение пользователя по id: GET http://localhost:8080/users/{id}.
 
 Film:
 1. Создание нового фильма: POST http://localhost:8080/films, в Request Body json с данными фильма.
 2. Обновление данных фильма: PUT http://localhost:8080/films, в Request Body json с данными фильма.
-3. Получние списка фильмов: GET http://localhost:8080/films.
-4. Получние фильма по id: GET http://localhost:8080/films/{id}.
+3. Получение списка фильмов: GET http://localhost:8080/films.
+4. Получение фильма по id: GET http://localhost:8080/films/{id}.
 
 Friends:
-1. Получние списка друзей пользователя: GET http://localhost:8080/users/{id}/friends.
-2. Получние списка общих друзей с другим пользователем: GET http://localhost:8080/users/{id}/friends/common/{friendId}.
+1. Получение списка друзей пользователя: GET http://localhost:8080/users/{id}/friends.
+2. Получение списка общих друзей с другим пользователем: GET http://localhost:8080/users/{id}/friends/common/{friendId}.
 3. Добавление в друзья: PUT http://localhost:8080/users/{id}/friends/{friendId}.
-4. Удаление пользователя из списка друзей: DELETE http://localhost:8080/users/{id}/friends/{friendId}.
+4. Удаление пользователя из друзей: DELETE http://localhost:8080/users/{id}/friends/{friendId}.
 
 Like:
-1. Поставить оценку фильму: PUT http://localhost:8080/films/{filmId}/like/{userId}.
-2. Убрать оценку у фильма: DELETE http://localhost:8080/films/{filmId}/like/{userId}.
-3. Получить списко популярных фильмов: GET http://localhost:8080/films/popular.
+1. Поставить лайк фильму: PUT http://localhost:8080/films/{filmId}/like/{userId}.
+2. Убрать лайк у фильма: DELETE http://localhost:8080/films/{filmId}/like/{userId}.
+3. Получить список популярных фильмов: GET http://localhost:8080/films/popular.
 
-### Пример запроса к БД
+### Примеры запросов к БД
 1. Получение всех фильмов: "select * from films"
-2. Получение всех Пользователей: "select * from users"
+2. Получение всех пользователей: "select * from users"
 3. Получение всех жанров: "select * from gerne"
-4. Получение всех вариантов рейтинг: "select * from mpa"
-
-Приложение написано на Java. Пример кода:
+4. Получение всех вариантов рейтинга: "select * from mpa"
+----
+Приложение написано на Java и протестировано JUnit. Пример кода:
 ```java
 @Override
     public Optional<Film> findFilmId(long id) {
@@ -64,6 +64,5 @@ Like:
         }
     }
 ```
-
-------
+----
 Приложение создано в рамках прохождения курса Java-разработчик от [Яндекс-Практикум](https://practicum.yandex.ru/java-developer/ "Тут учат Java!") 
