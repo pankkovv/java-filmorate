@@ -10,7 +10,7 @@
 5. Ранжировать фильмы по рейтингу.
 
 #### database-filmorate
-![FilmorateER.jpg][(https://github.com/pankkovv/java-filmorate/blob/add-databse/FilmorateER.jpg?raw=true)](https://github.com/pankkovv/java-filmorate/blob/main/FilmorateER.jpg)
+![FilmorateER alt][(https://github.com/pankkovv/java-filmorate/blob/add-databse/FilmorateER.jpg?raw=true)](https://github.com/pankkovv/java-filmorate/blob/main/FilmorateER.jpg)
 
 #### Примеры запросов
 User:
