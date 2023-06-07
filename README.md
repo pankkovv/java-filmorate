@@ -1,8 +1,7 @@
 # java-filmorate
-## Приложение соцсеть для оценивания фильмов 
-
-Взаимодействие с БД реализовано за счет Spring JDBC. 
-REST API создано на базе Spring Boot.
+Описание проекта
+Бекэнд сервиса соцсети с возможностью оценивания фильмов.
+Приложение позволяет взаимодествовать не только с фильмами, но и с другими пользователями, например, добавлять друг друга в друзья.
 
 Приложение имеет следующие функции:
 1. Создание фильмов и пользователей;
@@ -13,7 +12,7 @@ REST API создано на базе Spring Boot.
 6. Отображение списка фильмов, ранжированных по рейтингу.
 
 ### database-filmorate
-![FilmorateER data][(https://github.com/pankkovv/java-filmorate/blob/main/FilmorateER.jpg)
+![FilmorateER data][(https://github.com/pankkovv/java-filmorate/blob/e74ff70271532223fd86e31b323e9acc4129c3a0/FilmorateER.jpg)
 
 ### Примеры запросов
 User:
@@ -44,8 +43,23 @@ Like:
 2. Получение всех пользователей: "select * from users"
 3. Получение всех жанров: "select * from gerne"
 4. Получение всех вариантов рейтинга: "select * from mpa"
+
+## Стек
+- Java SE 9
+- Spring Boot
+- Spring JDBC
+- Database H2
+- JUnit
+
+## Шаги по запуску приложения
+- Склонировать репозиторий
+- Проверить наличие всех зависиостей синхронизировав pom.xml с локальным репозиторием
+- Запустить билд через консоль или среду разработки
+- Взаимодествовать с приложением через API http://localhost:8080/
+- Взаимодействовать с БД через API http://localhost:8080/h2-console с username= sa и password= password
+
 ----
-Приложение написано на Java и протестировано JUnit. Пример кода:
+Приложение написано на Java и протестировано. Пример кода:
 ```java
 @Override
     public Optional<Film> findFilmId(long id) {
