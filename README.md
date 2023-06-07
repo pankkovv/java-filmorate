@@ -11,7 +11,7 @@
 5. Возможность просмотра список общих друзей с другими пользователеми;
 6. Отображение списка фильмов, ранжированных по рейтингу.
 
-### database-filmorate
+### ER database-filmorate
 ![SCHEME](https://github.com/pankkovv/java-filmorate/blob/e74ff70271532223fd86e31b323e9acc4129c3a0/FilmorateER.jpg)
 
 ### Примеры запросов
