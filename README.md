@@ -45,7 +45,7 @@ Like:
 4. Получение всех вариантов рейтинга: "select * from mpa"
 
 ## Стек
-- Java SE 9
+- JDK 11
 - Spring Boot
 - Spring JDBC
 - Database H2
